@@ -20,6 +20,7 @@ from sklearn.model_selection import KFold
 from sklearn.model_selection import train_test_split
 from torch.optim.lr_scheduler import MultiStepLR
 from sklearn.metrics import roc_curve, auc, matthews_corrcoef,precision_recall_curve
+from utils import compute_rank,compute_rank_roc,compute_roc,compute_MAP
 
 import os
 @ck.command()
@@ -168,7 +169,8 @@ def main(data_root, batch_size, epochs, hiddim, load, device, negativefold,name,
             preds = []
             alllabel = []
             alltestpairs =[]
-            
+            p1 = []
+            p2 = []
             with ck.progressbar(length=test_steps, show_pos=True) as bar:
                 for batch_features, batch_labels,bathch_indexs in test_loader:
                     bar.update(1)
@@ -183,17 +185,38 @@ def main(data_root, batch_size, epochs, hiddim, load, device, negativefold,name,
                     
                     ###pairs:
                     x0index,x1index = bathch_indexs.chunk(2,axis=1)
+                    p1 = numpy.append(
+                                    p1,
+                                    x0index.detach().cpu().numpy())
+                    p2 = numpy.append(
+                                    p2,
+                                    x1index.detach().cpu().numpy())
                     x0index = torch.squeeze(x0index).tolist()
                     x1index = torch.squeeze(x1index).tolist()
                     pp = zip(x0index,x1index)
                     for p in pp:
                         alltestpairs.append(p)
+                    # for x in x0index:
+                    #     p1.append(x)   
+                    # for x in x1index:
+                    #     p2.append(x)  
+                predresult = pd.DataFrame({
+                    "p1":p1,
+                    "p2":p2,
+                    # "pairs": alltestpairs,
+                    "labels": alllabel,
+                    "preds":preds
+                    })
                     # alltestpairs = numpy.append(alltestpairs, bathch_indexs.detach().cpu().numpy())
                     ######
                 
                 
                 test_loss /= test_steps
-        
+
+            ranks,n_prots = compute_rank(predresult)
+            Mean_avg_precision = compute_MAP(predresult)
+            rk_roc = compute_rank_roc(ranks, n_prots)
+
             fpr,tpr,thresholds,roc_auc = compute_roc(alllabel, preds)
             accll,topacc,topthre,macc,mthr = acc_thre(thresholds,alllabel,preds,topk=5)
             # precisionll,recallll,thresholdsll = compute_aupr(alllabel, preds)
@@ -201,6 +224,8 @@ def main(data_root, batch_size, epochs, hiddim, load, device, negativefold,name,
             print('acc list len={}\nmax_acc={}|with_thre={}'.format(len(accll),macc,mthr))
             print('topk acc={}|with_thre={}'.format(topacc,topthre))
             print(f'Test Loss - {test_loss}, AUC - {roc_auc}',flush=True)
+            print(f'Test loss - {test_loss}, \nrkAUC - {rk_roc},AUC - {roc_auc}, MAP - {Mean_avg_precision}',flush=True)     
+
             precisionll,recallll,thresholdsll = compute_aupr(alllabel, preds)
             toppre,toprecall,topthres = aupr_thre(thresholdsll,precisionll,recallll)
             print('toppre={},toprecall={},thres={}'.format(toppre,toprecall,topthres),flush=True)

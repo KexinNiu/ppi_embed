@@ -19,6 +19,7 @@ class Loaddata():
         allpairs_csvfile = f'{svfolder}{name}_allpairs.csv'
         name2index_file = f'{svfolder}{name}_name2index.pkl'
         index2name_file = f'{svfolder}{name}_index2name.pkl'
+        
 
         
 
@@ -108,7 +109,7 @@ class Loaddata():
     def loadallpairs(self):
         
         allpairs_csvfile = f'{self.svfolder}{self.name}_allpairs.csv'
-
+        allpairs_file = f'{self.svfolder}{self.name}_allpairs.pkl'
 
         if os.path.exists(allpairs_csvfile):
             allpairs = pd.read_csv(allpairs_file)

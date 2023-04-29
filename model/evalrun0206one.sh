@@ -6,8 +6,8 @@
 #SBATCH -e eval_1_2.%J.err
 #SBATCH --mail-user=kexin.niu@kaust.edu.sa
 #SBATCH --mail-type=end
-#SBATCH --time=01:25:00
-#SBATCH --mem=10G
+#SBATCH --time=03:25:00
+#SBATCH --mem=20G
 
 printf 'evaluation...\n'
 
@@ -25,4 +25,4 @@ printf '######twof######'
 printf '######twof######'
 printf '######twof######'
 printf '######twof######'
-# python eval_0206multi_metric.py --data-root /ibex/scratch/projects/c2014/kexin/ppiproject/ccembed/scr/model/data/yeastdata --batch-size 64 --epochs 30 --name 4932.physical --esmfolder /ibex/scratch/projects/c2014/kexin/ppiproject/ccembed/scr/model/data/yeastdata/esm2_4932/ --modelname twof  --metric dot --load
+python eval_0206multi_metric.py --data-root /ibex/scratch/projects/c2014/kexin/ppiproject/ccembed/scr/model/data/yeastdata --batch-size 64 --epochs 30 --name 4932.physical --esmfolder /ibex/scratch/projects/c2014/kexin/ppiproject/ccembed/scr/model/data/yeastdata/esm2_4932/ --modelname twof  --metric dot --load
