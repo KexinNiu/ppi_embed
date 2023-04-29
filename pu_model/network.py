@@ -221,7 +221,8 @@ def tri_PUloss(output, batch_labels):
     pos_loss = 10 * torch.nn.functional.binary_cross_entropy_with_logits(pos, torch.ones_like(pos))
     neg_loss = torch.nn.functional.binary_cross_entropy_with_logits(neg, torch.zeros_like(neg))
     # notloss = (torch.mean(pos)-torch.mean(notneg)+5) + (torch.mean(notneg)-torch.mean(neg)+5)
-    notloss = torch.mean(pos) - torch.mean(torch.mean(notneg) + torch.mean(neg)) +5
+    notloss =  torch.mean(torch.mean(notneg) + torch.mean(neg))- torch.mean(pos) +5
+    
 
     # print('pos_loss-{}+neg_loss-{}+notloss-{}'.format(pos_loss,neg_loss,notloss),flush=True)
     
